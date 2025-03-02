@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
-import { hierarchy, HierarchyPointNode, HierarchyPointLink, HierarchyNode } from "d3-hierarchy";
+import { HierarchyPointNode, HierarchyNode } from "d3-hierarchy";
 
 interface TreeNode {
     title: string;
@@ -83,7 +83,7 @@ const TreeGraph = ({ treeData, maxDepth }: { treeData: TreeNode, maxDepth: numbe
                 </a>
             `);
 
-    }, [treeData]);
+    }, [treeData, maxDepth]);
 
     return <svg ref={svgRef} width="100%" height={`${(maxDepth + 1) * 1000}px`}></svg>;
 };
