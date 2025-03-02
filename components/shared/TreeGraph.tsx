@@ -1,9 +1,21 @@
 import * as d3 from "d3";
 import { useEffect, useRef } from "react";
+import { hierarchy, HierarchyPointNode, HierarchyPointLink, HierarchyNode } from "d3-hierarchy";
 
 interface TreeNode {
     title: string;
+    url: string,
     children?: TreeNode[];
+}
+
+interface TreeNodeWithPosition extends HierarchyNode<TreeNode> {
+    x: number;
+    y: number;
+}
+
+interface TreeLink {
+    source: TreeNodeWithPosition;
+    target: TreeNodeWithPosition;
 }
 
 const TreeGraph = ({ treeData, maxDepth }: { treeData: TreeNode, maxDepth: number }) => {
@@ -23,30 +35,38 @@ const TreeGraph = ({ treeData, maxDepth }: { treeData: TreeNode, maxDepth: numbe
 
         const rootNode = d3.hierarchy<TreeNode>(treeData, (d) => d.children);
         const layout = d3.tree<TreeNode>().size([dim.height - 50, dim.width - 320]);
-        layout(rootNode);
+        const layoutRoot = layout(rootNode) as unknown as TreeNodeWithPosition;
 
         const g = svg.append("g").attr("transform", "translate(140,50)");
 
-        // Draw links
         g.selectAll("path")
-            .data(rootNode.links())
+            .data(layoutRoot.links() as TreeLink[])
             .join("path")
             .attr("fill", "none")
             .attr("stroke", "white")
             .attr("stroke-width", 2)
-            .attr("d", d3.linkHorizontal()
-                .x((d: any) => d.y)
-                .y((d: any) => d.x)
-            );
+            .attr("d", (d: TreeLink) => {
+                const sourceX = d.source.y;
+                const sourceY = d.source.x;
+                const targetX = d.target.y;
+                const targetY = d.target.x;
+
+                const midX = (sourceX + targetX) / 2;
+                return `
+                    M ${sourceX},${sourceY}
+                    C ${midX},${sourceY} ${midX},${targetY} ${targetX},${targetY}
+                `;
+            });
+
 
         g.selectAll("foreignObject")
             .data(rootNode.descendants())
             .join("foreignObject")
-            .attr("x", (d: any) => d.y + 10)
-            .attr("y", (d: any) => d.x - 10)
+            .attr("x", (d) => (d as HierarchyPointNode<TreeNode>).y + 10)
+            .attr("y", (d) => (d as HierarchyPointNode<TreeNode>).x - 10)
             .attr("width", 150)
             .attr("height", 40)
-            .html((d: any) => `
+            .html((d) => `
                 <a href="${d.data.url || '#'}" target="_blank">
                     <div style="
                         background: #1b1b1f;
@@ -65,7 +85,7 @@ const TreeGraph = ({ treeData, maxDepth }: { treeData: TreeNode, maxDepth: numbe
 
     }, [treeData]);
 
-    return <svg ref={svgRef} width="100%" height={`${(maxDepth + 1)*1000}px`}></svg>;
+    return <svg ref={svgRef} width="100%" height={`${(maxDepth + 1) * 1000}px`}></svg>;
 };
 
 export default TreeGraph;

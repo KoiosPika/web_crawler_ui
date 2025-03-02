@@ -15,8 +15,12 @@ export interface ILink {
     parent_id: string | null;
 }
 
+export interface ITreeNode extends ILink {
+    children: ITreeNode[];
+}
+
 const buildTreeLayout = (flatData: ILink[]) => {
-    const idToNodeMap: { [key: string]: any } = {};
+    const idToNodeMap: { [key: string]: ITreeNode } = {};
     let root = null;
 
     flatData.forEach((node) => {
@@ -40,7 +44,7 @@ export default function MainPage() {
     const [url, setUrl] = useState("");
     const [depth, setDepth] = useState<number>(1);
     const [data, setData] = useState<ILink[]>([]);
-    const [treeRoot, setTreeRoot] = useState<any>(null);
+    const [treeRoot, setTreeRoot] = useState<ITreeNode | null>(null);
     const [loading, setLoading] = useState(false);
 
     const handleCrawl = async () => {
