@@ -5,7 +5,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import TreeGraph from "./TreeGraph";
 import { ScrollBar } from "../ui/scroll-area";
 import Image from "next/image";
-import { getCrawlData } from "@/lib/actions";
+import axios from "axios"
 
 export interface ILink {
     id: string;
@@ -49,9 +49,12 @@ export default function MainPage() {
 
     const handleCrawl = async () => {
         setLoading(true);
-        const crawledData = await getCrawlData(url, depth)
-        setData(crawledData)
-        console.log(data)
+        const response = await axios.post("/api/crawl", {
+            start_url: url,
+            max_depth: depth,
+        });
+        console.log(response.data.crawled_pages)
+        setData(response.data.crawled_pages)
         setLoading(false);
     };
 
