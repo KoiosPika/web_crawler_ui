@@ -6,6 +6,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import TreeGraph from "./TreeGraph";
 import { ScrollBar } from "../ui/scroll-area";
 import Image from "next/image";
+import { getCrawlData } from "@/lib/actions";
 
 export interface ILink {
     id: string;
@@ -49,15 +50,8 @@ export default function MainPage() {
 
     const handleCrawl = async () => {
         setLoading(true);
-        try {
-            const response = await axios.post("http://127.0.0.1:8000/crawl", {
-                start_url: url,
-                max_depth: depth,
-            });
-            setData(response.data.crawled_pages);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
+        const crawledData = await getCrawlData(url, depth)
+        setData(crawledData)
         setLoading(false);
     };
 
@@ -72,7 +66,7 @@ export default function MainPage() {
         <>
             <div className="flex flex-col items-center p-15 bg-[#1b1b1f] rounded-lg border-2 border-orange-400">
                 <div className="flex flex-row justify-center items-center">
-                    <Image src={'/crawler.png'} alt="crawler" height={70} width={70}/>
+                    <Image src={'/crawler.png'} alt="crawler" height={70} width={70} />
                     <h1 className="text-2xl font-bold text-orange-400">Web Crawler Tree</h1>
                 </div>
                 <input
