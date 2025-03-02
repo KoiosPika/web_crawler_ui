@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import TreeGraph from "./TreeGraph";
 import { ScrollBar } from "../ui/scroll-area";
