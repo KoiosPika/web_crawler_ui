@@ -1,8 +1,12 @@
 {
     "functions": {
-      "api/*": {
-        "timeout": 60
+      "api/test.js": {
+        "memory": 3009,
+        "maxDuration": 60
+      },
+      "api/*.js": {
+        "memory": 3009,
+        "maxDuration": 60
       }
     }
   }
-  
